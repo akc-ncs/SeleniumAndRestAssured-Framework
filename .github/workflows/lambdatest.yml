@@ -4,8 +4,8 @@ name: LambdaTest Cross-Browser
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  # pull_request:
+  #   branches: [main]
   # schedule:
   #   - cron: "0 20 * * 1-5"        # weekday nights (UTC)
   workflow_dispatch:
