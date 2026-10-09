@@ -49,6 +49,6 @@ public final class ConfigManager {
     }
 
     public static boolean isLambdaTest() {
-        return "lambdatest".equalsIgnoreCase(get("execution", "local"));
+        return "lambdatest_crossbrowser".equalsIgnoreCase(get("execution", "local"));
     }
 }
