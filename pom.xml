@@ -77,9 +77,9 @@
   </build>
   <profiles>
   <profile>
-    <id>lambdatest</id>
+    <id>lambdatest_crossbrowser</id>
     <properties>
-      <suite>src/test/resources/suites/lambdatest.xml</suite>
+      <suite>src/test/resources/suites/lambdatest_cross_browser.xml</suite>
     </properties>
     <build>
       <plugins>
@@ -88,7 +88,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
-              <execution>lambdatest</execution>
+              <execution>lambdatest_crossbrowser</execution>
             </systemPropertyVariables>
           </configuration>
         </plugin>
