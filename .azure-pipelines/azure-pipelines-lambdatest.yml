@@ -1,0 +1,59 @@
+# Needs a variable group "lambdatest-secrets" with LT_USERNAME and LT_ACCESS_KEY (key marked secret).
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+schedules:
+  - cron: "0 20 * * 1-5"
+    displayName: Weekday nights (UTC)
+    branches:
+      include: [main]
+    always: true
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: lambdatest-secrets
+  - name: MAVEN_CACHE
+    value: $(Pipeline.Workspace)/.m2/repository
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: "17"
+      jdkArchitectureOption: x64
+      jdkSourceOption: PreInstalled
+
+  - task: Cache@2
+    inputs:
+      key: 'maven | "$(Agent.OS)" | pom.xml'
+      restoreKeys: maven | "$(Agent.OS)"
+      path: $(MAVEN_CACHE)
+
+  - script: mvn -B -ntp test -Plambdatest -Dmaven.repo.local=$(MAVEN_CACHE) -Dlt.build=ado-$(Build.BuildId)
+    displayName: Run cross-browser suite on LambdaTest
+    env:
+      LT_USERNAME: $(LT_USERNAME)          # secrets must be mapped explicitly
+      LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: "**/surefire-reports/TEST-*.xml"
+      testRunTitle: LambdaTest cross-browser
+
+  - script: npx --yes allure-commandline generate target/allure-results --clean -o allure-report
+    displayName: Generate Allure report
+    condition: succeededOrFailed()
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: allure-report
+      artifact: allure-report

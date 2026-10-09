@@ -1,0 +1,33 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+  One <test> block per browser. parallel="tests" runs the three blocks at the same time,
+  so exactly 3 LambdaTest sessions are open at once (one per browser).
+  Run with:  mvn test -Plambdatest
+-->
+<suite name="LambdaTest Cross-Browser" parallel="tests" thread-count="3">
+  <listeners>
+    <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    <listener class-name="com.poc.framework.listeners.TestListener"/>
+  </listeners>
+
+  <test name="Chrome - Windows 11">
+    <parameter name="browser" value="chrome"/>
+    <parameter name="platform" value="Windows 11"/>
+    <parameter name="browserVersion" value="latest"/>
+    <packages><package name="com.poc.tests.ui"/></packages>
+  </test>
+
+  <test name="Edge - Windows 11">
+    <parameter name="browser" value="edge"/>
+    <parameter name="platform" value="Windows 11"/>
+    <parameter name="browserVersion" value="latest"/>
+    <packages><package name="com.poc.tests.ui"/></packages>
+  </test>
+
+  <test name="Safari - macOS Sonoma">
+    <parameter name="browser" value="safari"/>
+    <parameter name="platform" value="macOS Sonoma"/>
+    <parameter name="browserVersion" value="latest"/>
+    <packages><package name="com.poc.tests.ui"/></packages>
+  </test>
+</suite>
