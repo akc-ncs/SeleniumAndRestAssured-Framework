@@ -97,17 +97,64 @@ environment variable (uppercase key with dots changed to underscores), then
 
 LambdaTest credentials are read from `LT_USERNAME` and `LT_ACCESS_KEY`.
 
-## Allure Reports
+## Allure reports
 
-After running tests locally, generate and open the report with:
+Tests write their raw results to `target/allure-results`. The location is set in
+`src/test/resources/allure.properties`:
 
-```bash
-mvn allure:serve
+```properties
+allure.results.directory=target/allure-results
 ```
 
-Both GitHub Actions workflows upload Allure report or result artifacts. The CI
-workflow also uploads the generated report as an artifact; it does not publish the
-report to GitHub Pages.
+### View a report locally
+
+Install the Allure CLI once (it needs Java, which the project already requires):
+
+```bash
+npm install -g allure-commandline
+```
+
+Run the tests, then build and serve the report:
+
+```bash
+mvn clean test
+allure serve target/allure-results -h 127.0.0.1 -p 8000
+```
+
+Open <http://localhost:8000>. `allure serve` builds the report once when it
+starts, so stop it with `Ctrl+C` and run it again after each new test run.
+
+**Working on a remote server over SSH?** The command above only listens on the
+server's localhost. Forward the port to your laptop, either with the VS Code
+**Ports** tab or with `ssh -L 8000:localhost:8000 <user>@<server>`, then open
+<http://localhost:8000> on your laptop.
+
+To keep a report folder instead of serving one:
+
+```bash
+allure generate target/allure-results --clean -o allure-report
+allure open allure-report -h 127.0.0.1 -p 8000
+```
+
+> A report cannot be opened by double-clicking `index.html`. It must be served
+> over HTTP, which `allure serve` and `allure open` do for you.
+
+If the `allure-maven` plugin is still in `pom.xml`, `mvn allure:serve` is an
+alternative, but the Allure CLI above is the recommended route.
+
+### Reports in CI
+
+Both GitHub Actions workflows build an Allure report from the test results and
+upload it as a downloadable artifact. Neither publishes it to GitHub Pages.
+
+| Workflow          | Artifacts |
+| ---               | ---       |
+| `ci.yml`          | `allure-results-api`, `allure-results-ui`, and the merged `allure-report` |
+| `lambdatest.yml`  | `allure-report` and `allure-results` |
+
+To read a CI report, download the `allure-report` artifact from the run page,
+unzip it, and run `allure open <unzipped-folder>`.
+
 
 ## Adding Tests
 
